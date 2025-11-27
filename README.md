@@ -16,7 +16,7 @@ A powerful CLI tool for generating production-ready Node.js + TypeScript backend
 ## Installation
 
 ```bash
-npm install -g polycore
+npm install -g @shahidpolycore/polycore
 ```
 
 ## Usage
