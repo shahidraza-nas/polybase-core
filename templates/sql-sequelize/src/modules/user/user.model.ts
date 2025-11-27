@@ -1,5 +1,5 @@
 import { DataTypes, Model } from 'sequelize';
-import { sequelize } from '../../config/database.config.js';
+import { getSequelize } from '../../config/database.config.js';
 
 export interface UserAttributes {
     id: string;
@@ -19,7 +19,8 @@ export class User extends Model<UserAttributes> implements UserAttributes {
     declare readonly updatedAt: Date;
 }
 
-(User as any).init(
+// Initialize model - called after env is loaded
+User.init(
     {
         id: {
             type: DataTypes.UUID,
@@ -44,7 +45,7 @@ export class User extends Model<UserAttributes> implements UserAttributes {
         },
     },
     {
-        sequelize,
+        sequelize: getSequelize(),
         tableName: 'users',
         timestamps: true,
     }

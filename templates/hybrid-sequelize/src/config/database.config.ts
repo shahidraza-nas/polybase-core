@@ -8,7 +8,7 @@ class Database {
   // SQL Database
   static getSqlInstance(): Sequelize {
     if (!Database.sqlInstance) {
-      Database.sqlInstance = new Sequelize(process.env.SQL_DATABASE_URL || '', {
+      Database.sqlInstance = new Sequelize(process.env.DATABASE_URL || '', {
         logging: process.env.NODE_ENV === 'development' ? (msg) => logger.debug(msg) : false,
         pool: {
           max: 5,
@@ -45,7 +45,7 @@ class Database {
   // NoSQL Database
   static async connectMongo(): Promise<void> {
     try {
-      await mongoose.connect(process.env.MONGO_DATABASE_URL || '');
+      await mongoose.connect(process.env.MONGODB_URI || '');
       logger.info('MongoDB connected successfully');
     } catch (error) {
       logger.error('MongoDB connection failed', error);
@@ -77,5 +77,6 @@ class Database {
   }
 }
 
-export const sequelize = Database.getSqlInstance();
+// Export a getter function instead of instantiating immediately
+export const getSequelize = () => Database.getSqlInstance();
 export default Database;

@@ -8,7 +8,7 @@ const program = new Command();
 program
   .name('polycore')
   .description('Backend boilerplate generator for SQL + NoSQL')
-  .version('1.0.0');
+  .version('1.0.3');
 
 program
   .command('init <projectName>')

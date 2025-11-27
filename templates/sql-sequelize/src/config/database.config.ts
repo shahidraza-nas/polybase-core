@@ -51,5 +51,6 @@ class Database {
   }
 }
 
-export const sequelize = Database.getInstance();
+// Export a getter function instead of instantiating immediately
+export const getSequelize = () => Database.getInstance();
 export default Database;

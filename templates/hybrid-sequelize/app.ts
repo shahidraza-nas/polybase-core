@@ -1,10 +1,12 @@
+// Load environment variables first
+import { config } from './src/config/env.config.js';
+
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import routes from './src/routes.js';
 import { errorHandler, notFoundHandler } from './src/middlewares/error.middleware.js';
 import { requestLogger } from './src/middlewares/logger.middleware.js';
-import { config } from './src/config/env.config.js';
 
 const app = express();
 

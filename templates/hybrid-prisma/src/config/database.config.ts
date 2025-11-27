@@ -9,12 +9,7 @@ class Database {
   static getPrismaInstance(): PrismaClient {
     if (!Database.prismaInstance) {
       Database.prismaInstance = new PrismaClient({
-        log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
-        datasources: {
-          db: {
-            url: process.env.SQL_DATABASE_URL
-          }
-        }
+        log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error']
       });
     }
     return Database.prismaInstance;
@@ -34,7 +29,7 @@ class Database {
   // NoSQL Database (MongoDB)
   static async connectMongo(): Promise<void> {
     try {
-      await mongoose.connect(process.env.MONGO_DATABASE_URL || '');
+      await mongoose.connect(process.env.MONGODB_URI || '');
       logger.info('MongoDB connected successfully');
     } catch (error) {
       logger.error('MongoDB connection failed', error);
