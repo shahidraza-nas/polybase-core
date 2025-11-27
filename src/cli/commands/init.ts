@@ -51,6 +51,13 @@ export default async function initProject(name: string) {
     await fs.mkdirp(targetDir);
     await copyTemplate(templateDir, targetDir);
 
+    // Copy .env.example to .env
+    const envExamplePath = path.join(targetDir, '.env.example');
+    const envPath = path.join(targetDir, '.env');
+    if (await fs.pathExists(envExamplePath)) {
+      await fs.copy(envExamplePath, envPath);
+    }
+
     spinner.succeed(chalk.green('Project structure created!'));
 
     // Initialize git repository
@@ -84,6 +91,7 @@ export default async function initProject(name: string) {
     if (!answers.install) {
       console.log(chalk.white('  npm install'));
     }
+    console.log(chalk.yellow('  Edit .env file with your database credentials'));
     console.log(chalk.white('  npm run dev\n'));
 
   } catch (error) {
