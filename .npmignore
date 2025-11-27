@@ -1,0 +1,41 @@
+# Source files (only ship compiled dist/)
+src/
+tsconfig.json
+build.bat
+setup-node.sh
+
+# Development files
+.vscode/
+.github/
+*.log
+*.tsbuildinfo
+
+# Documentation (optional - keep DEVELOPMENT.md out of package)
+DEVELOPMENT.md
+
+# Test files
+test/
+tests/
+*.test.ts
+*.spec.ts
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Git
+.git/
+.gitignore
+
+# Node
+node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+*.swp
+*.swo
+*~
