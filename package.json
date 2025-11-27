@@ -1,5 +1,5 @@
 {
-  "name": "@shahidpolycore/polycore",
+  "name": "polycore-cli",
   "version": "1.0.0",
   "description": "Backend boilerplate generator for Node.js + TypeScript with SQL/NoSQL/Hybrid support",
   "type": "module",
