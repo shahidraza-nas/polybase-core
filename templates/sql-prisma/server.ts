@@ -1,7 +1,6 @@
 import app from './app.js';
-import Database from './src/config/database.config.js';
-import { config } from './src/config/env.config.js';
-import { logger } from './src/core/utils/logger.util.js';
+import Database, { config } from './src/config/index.js';
+import { logger } from './src/core/index.js';
 
 const startServer = async () => {
   try {

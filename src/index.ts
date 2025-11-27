@@ -1,14 +1,12 @@
 import { Command } from 'commander';
-import initProject from './cli/commands/init.js';
-import generate from './cli/commands/generate.js';
-import doctor from './cli/commands/doctor.js';
+import { initProject, generate, doctor } from './cli/index.js';
 
 const program = new Command();
 
 program
   .name('polycore')
   .description('Backend boilerplate generator for SQL + NoSQL')
-  .version('1.0.3');
+  .version('1.0.4');
 
 program
   .command('init <projectName>')

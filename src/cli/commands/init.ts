@@ -3,9 +3,9 @@ import { fileURLToPath } from 'url';
 import fs from 'fs-extra';
 import ora from 'ora';
 import chalk from 'chalk';
-import { initPrompts } from '../prompts.js';
-import { copyTemplate } from '../../utils/copy.js';
 import { execSync } from 'child_process';
+import { initPrompts } from '../prompts.js';
+import { copyTemplate } from '../../utils/index.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
