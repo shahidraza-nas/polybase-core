@@ -55,21 +55,49 @@ git push origin feature/your-feature-name
 ```
 
 ### Agent Instructions
-**CRITICAL**: Before starting ANY work:
-1. Check current branch: `git branch --show-current`
-2. Determine appropriate branch for the work:
-   - New feature → `feature/feature-name`
-   - Bug fix → `bugfix/issue-description`
-   - Release prep → `release/vX.Y.Z`
-3. Create/switch to appropriate branch before making changes
-4. Always reference the target branch in commit messages
-5. Never work directly on `main` or `develop`
+**CRITICAL - STRICTLY ENFORCED**: Before starting ANY work:
+
+1. **Check current branch**: `git branch --show-current`
+2. **STOP if on main or develop** - Never commit directly to these branches
+3. **Create feature branch FIRST**:
+   ```bash
+   git checkout develop
+   git pull origin develop
+   git checkout -b feature/your-feature-name
+   ```
+4. **Make ALL changes on the feature branch**
+5. **Commit only to the feature branch**
+6. **Push feature branch and create PR to develop**
+
+**ABSOLUTE RULES - NO EXCEPTIONS**:
+- ❌ NEVER `git commit` while on `main` branch
+- ❌ NEVER `git commit` while on `develop` branch
+- ✅ ALWAYS create a feature branch first
+- ✅ ALWAYS work on feature/bugfix/hotfix/release branches
 
 **Branch Selection Logic**:
-- User requests new feature → Create `feature/*` branch
-- User reports bug → Create `bugfix/*` branch
-- Preparing release → Create `release/*` branch
-- Production emergency → Create `hotfix/*` branch
+- User requests new feature → `git checkout -b feature/descriptive-name`
+- User reports bug → `git checkout -b bugfix/issue-description`
+- Preparing release → `git checkout -b release/vX.Y.Z`
+- Production emergency → `git checkout -b hotfix/critical-issue`
+
+**Pre-commit hook enforces this** - Direct commits to main/develop will be rejected.
+
+**Workflow Example**:
+```bash
+/* WRONG - Will be rejected by hook */
+git checkout develop
+git add .
+git commit -m "feat: new feature"  # ❌ REJECTED!
+
+/* CORRECT - Proper workflow */
+git checkout develop
+git checkout -b feature/my-new-feature
+git add .
+git commit -m "feat: new feature"  # ✅ Allowed
+git push origin feature/my-new-feature
+/* Then create PR on GitHub */
+```
 
 ---
 
