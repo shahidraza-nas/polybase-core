@@ -54,6 +54,14 @@ export default async function initProject(name: string) {
       await fs.copy(envExamplePath, envPath);
     }
 
+    // Update package.json with actual project name
+    const packageJsonPath = path.join(targetDir, 'package.json');
+    if (await fs.pathExists(packageJsonPath)) {
+      const packageJson = await fs.readJson(packageJsonPath);
+      packageJson.name = name;
+      await fs.writeJson(packageJsonPath, packageJson, { spaces: 2 });
+    }
+
     spinner.succeed(chalk.green('Project structure created!'));
 
     // Initialize git repository
