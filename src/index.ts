@@ -1,12 +1,16 @@
 import { Command } from 'commander';
+import { createRequire } from 'module';
 import { initProject, generate, doctor } from './cli/index.js';
+
+const require = createRequire(import.meta.url);
+const packageJson = require('../package.json');
 
 const program = new Command();
 
 program
   .name('polycore')
   .description('Backend boilerplate generator for SQL + NoSQL')
-  .version('1.1.0');
+  .version(packageJson.version);
 
 program
   .command('init <projectName>')
