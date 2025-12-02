@@ -1,0 +1,44 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Pre-commit hook to enforce feature branch workflow
+
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+if [ "$BRANCH" = "main" ] || [ "$BRANCH" = "develop" ]; then
+  echo ""
+  echo "❌ =========================================="
+  echo "   COMMIT REJECTED!"
+  echo "=========================================="
+  echo ""
+  echo "You cannot commit directly to '$BRANCH' branch."
+  echo ""
+  echo "📋 Please follow the branching strategy:"
+  echo "   1. Create a feature branch:"
+  echo "      git checkout -b feature/your-feature-name"
+  echo ""
+  echo "   2. Make your changes and commit to that branch"
+  echo ""
+  echo "   3. Push and create a PR to develop:"
+  echo "      git push origin feature/your-feature-name"
+  echo ""
+  echo "📖 See BRANCHING.md for complete details."
+  echo ""
+  exit 1
+fi
+
+# Allow commits to feature/bugfix/hotfix/release branches
+if echo "$BRANCH" | grep -qE "^(feature|bugfix|hotfix|release)/"; then
+  echo "✅ Committing to branch: $BRANCH"
+  exit 0
+fi
+
+echo ""
+echo "⚠️  WARNING: You're on branch '$BRANCH'"
+echo "   Consider using proper branch naming:"
+echo "   - feature/*  (new features)"
+echo "   - bugfix/*   (bug fixes)"
+echo "   - hotfix/*   (production hotfixes)"
+echo "   - release/*  (release preparation)"
+echo ""
+exit 0
