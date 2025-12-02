@@ -10,6 +10,69 @@ This is an **npm CLI tool** (`polycore-cli`) that generates Express/TypeScript b
 
 ---
 
+## Git Branching Strategy
+
+### Branch Structure
+```
+main (protected)              - Production-ready releases only
+├── develop                   - Integration branch for features
+├── feature/*                 - Feature development branches
+├── bugfix/*                  - Bug fix branches
+├── release/*                 - Release preparation branches
+└── hotfix/*                  - Emergency production fixes
+```
+
+### Workflow Rules
+1. **Never commit directly to `main`** - All changes via pull requests
+2. **Feature development**: Branch from `develop`, merge back to `develop`
+3. **Release process**: `develop` → `release/vX.Y.Z` → `main` (tagged)
+4. **Hotfixes**: Branch from `main`, merge to both `main` and `develop`
+
+### Branch Naming Conventions
+- `feature/auth-module` - New features
+- `feature/testing-infrastructure` - Major additions
+- `bugfix/jwt-type-error` - Bug fixes
+- `release/v1.2.0` - Release preparation
+- `hotfix/critical-security-fix` - Production hotfixes
+
+### Current Active Branches
+- `main` - v1.2.0 (latest release)
+- `develop` - Integration branch (create from main)
+
+### Creating Feature Branches
+```bash
+/* From develop branch */
+git checkout develop
+git pull origin develop
+git checkout -b feature/your-feature-name
+
+/* Work on feature */
+git add .
+git commit -m "feat: descriptive message"
+
+/* Push and create PR to develop */
+git push origin feature/your-feature-name
+```
+
+### Agent Instructions
+**CRITICAL**: Before starting ANY work:
+1. Check current branch: `git branch --show-current`
+2. Determine appropriate branch for the work:
+   - New feature → `feature/feature-name`
+   - Bug fix → `bugfix/issue-description`
+   - Release prep → `release/vX.Y.Z`
+3. Create/switch to appropriate branch before making changes
+4. Always reference the target branch in commit messages
+5. Never work directly on `main` or `develop`
+
+**Branch Selection Logic**:
+- User requests new feature → Create `feature/*` branch
+- User reports bug → Create `bugfix/*` branch
+- Preparing release → Create `release/*` branch
+- Production emergency → Create `hotfix/*` branch
+
+---
+
 ## Architecture Overview
 
 ### CLI Flow (Commander + Inquirer)
