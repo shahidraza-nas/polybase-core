@@ -1,6 +1,6 @@
 {
   "name": "polycore-cli",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Backend boilerplate generator for Node.js + TypeScript with SQL/NoSQL/Hybrid support",
   "type": "module",
   "bin": {
