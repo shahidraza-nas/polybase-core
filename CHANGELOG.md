@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.1] - 2025-12-02
+
+### Fixed
+
+- Fixed package.json name not being updated with actual project name during `polycore init <name>`
+- Generated projects now correctly use the specified project name instead of hardcoded "my-api-project"
+
 ## [1.2.0] - 2025-12-02
 
 ### Added
