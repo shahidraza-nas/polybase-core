@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.2] - 2025-12-02
+
+### Fixed
+
+- Fixed CLI version display to read dynamically from package.json instead of hardcoded value
+- `polycore --version` now correctly shows the actual installed version
+
 ## [1.2.1] - 2025-12-02
 
 ### Fixed
