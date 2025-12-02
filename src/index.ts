@@ -13,10 +13,7 @@ program
   .description('Initialize a new API project')
   .action(initProject);
 
-program
-  .command('generate <type> <name>')
-  .description('Generate module or model')
-  .action(generate);
+program.command('generate <type> <name>').description('Generate module or model').action(generate);
 
 program
   .command('doctor')

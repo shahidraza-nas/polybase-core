@@ -32,6 +32,24 @@ User runs: polycore init myapp
 - `src/utils/copy.ts` - Simple fs-extra wrapper with `overwrite: false`
 - `bin/cli.js` - Shebang entry point, imports `dist/index.js`
 
+### CLI Implementation Details
+**Commander setup** (`src/index.ts`):
+- Version synced with package.json (`1.1.0`)
+- Three commands: `init <projectName>`, `generate <type> <name>`, `doctor`
+- Each command imports handler from `src/cli/index.js` (re-exported from commands/)
+
+**User experience patterns:**
+- `ora` spinners for long operations with `.start()`, `.succeed()`, `.fail()`, `.warn()`
+- `chalk` colors: blue for info, green for success, red for errors, yellow for warnings
+- `inquirer` for interactive prompts (sequential, not all-at-once)
+- `execSync` with `stdio: 'ignore'` for silent git init, `stdio: 'inherit'` for visible npm install
+
+**Error handling:**
+- Try-catch wraps entire init flow
+- Spinner stops before prompts, restarts after
+- `process.exit(1)` on critical failures (directory exists, template not found)
+- Graceful degradation (git init fails → warn, continue; npm install fails → show manual steps)
+
 ### Template Structure
 5 template directories in `templates/`: `sql-prisma`, `sql-sequelize`, `nosql`, `hybrid-prisma`, `hybrid-sequelize`
 
@@ -80,13 +98,97 @@ class BaseService {
 
 ## Critical Conventions
 
+### Code Style - IMPORTANT
+**Always use multiline comment syntax** (`/* */`) instead of single-line (`//`) for all comments:
+```typescript
+/* Good - multiline syntax */
+const foo = 'bar';
+
+/* 
+ * Good - multiline syntax for longer comments
+ * Multiple lines are fine
+ */
+const baz = 'qux';
+
+// Bad - avoid single-line comments
+const bad = 'example';
+```
+
+**Barrel Exports Pattern** - REQUIRED for all modules:
+Use index.ts files to create clean import paths and better code organization:
+
+```typescript
+/* src/core/errors/index.ts - Barrel export */
+export * from './app-error.js';
+
+/* src/core/utils/index.ts - Barrel export */
+export * from './logger.util.js';
+export * from './response.util.js';
+
+/* src/modules/auth/index.ts - Barrel export */
+export * from './auth.dto.js';
+export * from './auth.service.js';
+export * from './auth.controller.js';
+export { default as authRoutes } from './auth.routes.js';
+
+/* Usage in other files - Clean imports */
+import { UnauthorizedError, ConflictError } from '../../core/errors/index.js';
+import { ApiResponse } from '../../core/utils/index.js';
+import { authRoutes } from './modules/auth/index.js';
+```
+
+**Benefits of barrel exports:**
+- Cleaner import statements (no deep path traversal)
+- Easier refactoring (change internals without updating all imports)
+- Better encapsulation (control what gets exported)
+- Improved IDE autocomplete
+- Single source of truth for module exports
+
+**When to create barrel exports:**
+- Every module directory (e.g., `src/modules/auth/`)
+- Shared utility directories (e.g., `src/core/errors/`, `src/core/utils/`)
+- Decorator/helper directories (e.g., `src/core/decorators/`)
+- NOT needed for single-file directories
+
 ### ESM Requirements
 - **Package is strict ESM**: `"type": "module"` in package.json
 - All imports MUST use `.js` extension: `import foo from './bar.js'` (even for `.ts` files)
 - No `require()` - only `import`/`export`
 - `__dirname` doesn't exist - use: `path.dirname(fileURLToPath(import.meta.url))`
 
-**Why `.js` extensions:** TypeScript with ESM requires explicit file extensions in imports, but they reference the compiled output (`.js`), not source (`.ts`). This is a TypeScript ESM constraint.
+**TypeScript Configuration for ESM:**
+```json
+{
+  "compilerOptions": {
+    "module": "NodeNext",             /* CRITICAL: Must be NodeNext when using moduleResolution: NodeNext */
+    "moduleResolution": "NodeNext",   /* CRITICAL: Must be NodeNext or Node16, NOT bundler */
+    "target": "ES2020"
+  }
+}
+```
+
+**Why `.js` extensions in TypeScript files:**
+When using TypeScript with ESM (`"type": "module"`), you MUST use `.js` extensions in import statements, even though your source files are `.ts`. This is because:
+1. TypeScript doesn't transform import paths during compilation
+2. The imports reference what will exist at runtime (the compiled `.js` files)
+3. Node.js ESM requires explicit file extensions
+4. This is an official TypeScript ESM design decision
+
+**IDE Navigation:**
+With `"moduleResolution": "NodeNext"`, VS Code will correctly resolve `.js` imports to the corresponding `.ts` source files, allowing "Go to Definition" to work properly.
+
+Example:
+```typescript
+/* ✅ CORRECT - Use .js even though the file is auth.service.ts */
+import { AuthService } from './auth.service.js';
+import { UnauthorizedError } from '../core/errors/index.js';
+
+/* ❌ WRONG - TypeScript won't compile with NodeNext resolution */
+import { AuthService } from './auth.service.ts';
+import { AuthService } from './auth.service';
+```
+
+**Source:** https://www.typescriptlang.org/docs/handbook/modules/theory.html#typescript-imitates-the-hosts-module-resolution-but-with-types
 
 ### Path Resolution After Build
 ```typescript
@@ -100,15 +202,21 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 **Critical:** Templates are NOT compiled - they stay at project root. The npm `files` field includes `dist`, `bin`, and `templates` for publishing.
 
 ### Build & Test Workflow
-1. `npm run build` or `tsc` - compiles `src/` → `dist/` (tsconfig.json: `outDir: "dist"`)
-2. `npm link` - symlinks `polycore` to global npm, uses `bin/cli.js` → `dist/index.js`
-3. `polycore init test-app` - test command in any directory
-4. Make changes → `npm run build` (changes reflected immediately via symlink)
-5. `npm unlink -g polycore-cli` - cleanup when done
+1. **Build:** `npm run build` or `tsc` - compiles `src/` → `dist/` (tsconfig.json: `outDir: "dist"`)
+   - Windows shortcut: `build.bat` (uses `npx tsc` with error handling)
+2. **Link for testing:** `npm link` - symlinks `polycore` to global npm
+   - Uses `bin/cli.js` → `dist/index.js` entry point
+3. **Test CLI:** `polycore init test-app` - test command in any directory
+4. **Iterate:** Make changes → `npm run build` (changes reflected immediately via symlink)
+5. **Cleanup:** `npm unlink -g polycore-cli` when done
 
 **Entry point flow:** User runs `polycore` → `bin/cli.js` (shebang) → imports `dist/index.js` (compiled Commander setup)
 
-**Publishing:** `npm publish` includes only `dist/`, `bin/`, `templates/` (see package.json `files` field)
+**Publishing workflow:**
+- `npm publish` includes only `dist/`, `bin/`, `templates/` (see package.json `files` field)
+- Pre-publish: Update author/repository in package.json, test with `npm pack --dry-run`
+- Version bumps: `npm version patch|minor|major` (creates git tags automatically)
+- See `PUBLISH.md` for complete checklist
 
 ### File Naming Patterns
 - Commands: lowercase `{name}.ts` (e.g., `init.ts`, `doctor.ts`, `generate.ts`)
@@ -216,9 +324,12 @@ const templateDir = path.join(__dirname, '../../../templates', templatePath);
 // dist/cli/commands/init.js → ../../../ → root/templates/
 ```
 
+**Template validation:** Init command checks `fs.pathExists(templateDir)` before copying - template name must match exactly.
+
 ### Directory already exists error
-CLI checks target directory before copying. If exists, exits with error.  
-**Workaround:** Delete or rename existing directory, or change project name.
+CLI checks target directory before copying with `fs.pathExists()`. If exists, exits with error code 1.  
+**Workaround:** Delete or rename existing directory, or change project name.  
+**Implementation:** See `src/cli/commands/init.ts` line ~20 for pre-flight check pattern.
 
 ### npm install fails in generated project
 **Common causes:**

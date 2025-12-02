@@ -1,44 +1,58 @@
 import inquirer from 'inquirer';
 
-export const initPrompts = async () => {
-  const answers: any = await inquirer.prompt([
+export interface InitPromptAnswers {
+  dbType: 'SQL' | 'NoSQL' | 'Hybrid';
+  sqlOrm?: 'Prisma' | 'Sequelize';
+  git: boolean;
+  install: boolean;
+}
+
+export const initPrompts = async (): Promise<InitPromptAnswers> => {
+  const dbTypeAnswer = await inquirer.prompt<{ dbType: 'SQL' | 'NoSQL' | 'Hybrid' }>([
     {
       type: 'list',
       name: 'dbType',
       message: 'Choose database type:',
       choices: ['SQL', 'NoSQL', 'Hybrid'],
-      default: 'SQL'
-    }
+      default: 'SQL',
+    },
   ]);
 
+  let sqlOrm: 'Prisma' | 'Sequelize' | undefined;
+
   // Ask for SQL ORM choice if SQL or Hybrid mode
-  if (answers.dbType === 'SQL' || answers.dbType === 'Hybrid') {
-    const ormChoice = await inquirer.prompt([
+  if (dbTypeAnswer.dbType === 'SQL' || dbTypeAnswer.dbType === 'Hybrid') {
+    const ormChoice = await inquirer.prompt<{ sqlOrm: 'Prisma' | 'Sequelize' }>([
       {
         type: 'list',
         name: 'sqlOrm',
         message: 'Choose SQL ORM:',
         choices: ['Prisma', 'Sequelize'],
-        default: 'Prisma'
-      }
+        default: 'Prisma',
+      },
     ]);
-    answers.sqlOrm = ormChoice.sqlOrm;
+    sqlOrm = ormChoice.sqlOrm;
   }
 
-  const finalAnswers = await inquirer.prompt([
+  const finalAnswers = await inquirer.prompt<{ git: boolean; install: boolean }>([
     {
       type: 'confirm',
       name: 'git',
       message: 'Initialize Git repository?',
-      default: true
+      default: true,
     },
     {
       type: 'confirm',
       name: 'install',
       message: 'Install dependencies now?',
-      default: false
-    }
+      default: false,
+    },
   ]);
 
-  return { ...answers, ...finalAnswers };
+  return {
+    dbType: dbTypeAnswer.dbType,
+    sqlOrm,
+    git: finalAnswers.git,
+    install: finalAnswers.install,
+  };
 };

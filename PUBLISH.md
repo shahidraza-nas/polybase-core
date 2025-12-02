@@ -155,12 +155,15 @@ npm info polycore
 ## Common Issues
 
 ### Issue: Package name already taken
+
 Solution: Choose a different name or use scoped package `@yourname/polycore`
 
 ### Issue: Permission denied
+
 Solution: Run `npm login` first and ensure you have publish rights
 
 ### Issue: 403 Forbidden
+
 Solution: Package might exist. Use `npm view polycore` to check
 
 ## Update Strategy
@@ -185,11 +188,12 @@ If "polycore" is taken, use scoped package:
 ```
 
 Users install with:
+
 ```bash
 npm install -g @yourusername/polycore
 ```
 
-## Ready to Publish!
+## Ready to Publish
 
 Your package is ready for npm. Just update author/repository info and run:
 

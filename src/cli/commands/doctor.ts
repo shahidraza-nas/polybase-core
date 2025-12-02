@@ -8,12 +8,12 @@ export default function doctor() {
     { name: 'Node.js', command: 'node --version', required: true },
     { name: 'npm', command: 'npm --version', required: true },
     { name: 'Git', command: 'git --version', required: false },
-    { name: 'TypeScript', command: 'tsc --version', required: false }
+    { name: 'TypeScript', command: 'tsc --version', required: false },
   ];
 
   let allPassed = true;
 
-  checks.forEach(check => {
+  checks.forEach((check) => {
     try {
       const version = execSync(check.command, { encoding: 'utf-8' }).trim();
       console.log(chalk.green(`✓ ${check.name}: ${version}`));

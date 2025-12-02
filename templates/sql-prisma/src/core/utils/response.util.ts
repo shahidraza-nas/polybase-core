@@ -21,6 +21,10 @@ export class ApiResponse {
     return this.success(res, data, message, 201);
   }
 
+  static unauthorized(res: Response, message = 'Unauthorized') {
+    return this.error(res, message, 401);
+  }
+
   static noContent(res: Response) {
     return res.status(204).send();
   }

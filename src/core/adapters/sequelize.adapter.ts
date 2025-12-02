@@ -18,9 +18,9 @@ export class SequelizeAdapter {
 
   async update(model: string, where: any, data: any) {
     const Model = this.db.models[model];
-    const [count, rows] = await Model.update(data, { 
-      where, 
-      returning: true 
+    const [_count, rows] = await Model.update(data, {
+      where,
+      returning: true,
     });
     return rows[0];
   }

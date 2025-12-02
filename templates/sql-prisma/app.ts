@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 import routes from './src/routes.js';
 import { errorHandler, notFoundHandler, requestLogger } from './src/middlewares/index.js';
 import { config } from './src/config/index.js';
@@ -10,6 +11,18 @@ const app = express();
 // Security middleware
 app.use(helmet());
 app.use(cors({ origin: config.corsOrigin }));
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.',
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
+
+// Apply rate limiting to all API routes
+app.use('/api', limiter);
 
 // Body parser middleware
 app.use(express.json());

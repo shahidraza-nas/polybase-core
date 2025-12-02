@@ -30,17 +30,13 @@ export default async function initProject(name: string) {
 
     // Determine template directory based on database type and ORM
     let templatePath = answers.dbType.toLowerCase();
-    
+
     // For SQL and Hybrid modes, append ORM choice
     if (answers.sqlOrm) {
       templatePath = `${templatePath}-${answers.sqlOrm.toLowerCase()}`;
     }
 
-    const templateDir = path.join(
-      __dirname,
-      '../../../templates',
-      templatePath
-    );
+    const templateDir = path.join(__dirname, '../../../templates', templatePath);
 
     // Check if template exists
     if (!(await fs.pathExists(templateDir))) {
@@ -93,7 +89,6 @@ export default async function initProject(name: string) {
     }
     console.log(chalk.yellow('  Edit .env file with your database credentials'));
     console.log(chalk.white('  npm run dev\n'));
-
   } catch (error) {
     spinner.fail(chalk.red('Failed to create project'));
     console.error(chalk.red(`\nError: ${error instanceof Error ? error.message : error}`));

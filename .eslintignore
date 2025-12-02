@@ -1,0 +1,7 @@
+node_modules
+dist
+templates
+coverage
+*.config.ts
+*.config.js
+bin/

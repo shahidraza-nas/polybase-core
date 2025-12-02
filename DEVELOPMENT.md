@@ -3,37 +3,44 @@
 ## Setup for Local Development
 
 ### Prerequisites
+
 - Node.js 18+ installed
 - npm or yarn
 
 ### Initial Setup
 
 1. **Clone and navigate to project**
+
    ```bash
    cd polybase-core
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Build the project**
+
    ```bash
    npx typescript
    ```
-   
+
    Or if typescript is installed globally:
+
    ```bash
    tsc
    ```
 
 4. **Link for local testing**
+
    ```bash
    npm link
    ```
 
 5. **Test the CLI**
+
    ```bash
    polycore --help
    polycore init test-project
@@ -43,6 +50,7 @@
 ### Development Workflow
 
 **After making changes:**
+
 ```bash
 npm run build
 ```
@@ -75,6 +83,7 @@ If you encounter UNC path errors, try:
 
 1. Clone to Windows filesystem directly (C:\projects\polybase-core)
 2. Or use WSL terminal exclusively:
+
    ```bash
    wsl
    cd ~/workspace/polybase-core
@@ -86,11 +95,13 @@ If you encounter UNC path errors, try:
 ### TypeScript not compiling
 
 Ensure TypeScript is in node_modules:
+
 ```bash
 ls node_modules/typescript
 ```
 
 If missing:
+
 ```bash
 npm install
 ```

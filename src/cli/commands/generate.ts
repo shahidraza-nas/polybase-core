@@ -24,20 +24,20 @@ export default async function generate(type: string, name: string) {
   // Check if we're in a polycore project
   const cwd = process.cwd();
   const packageJsonPath = path.join(cwd, 'package.json');
-  
-  if (!await fs.pathExists(packageJsonPath)) {
+
+  if (!(await fs.pathExists(packageJsonPath))) {
     spinner.fail(chalk.red('Not in a Node.js project'));
     console.log(chalk.yellow('\nPlease run this command from your project root.\n'));
     process.exit(1);
   }
 
   const packageJson = await fs.readJSON(packageJsonPath);
-  
+
   // Detect project type
   const hasPrisma = packageJson.dependencies?.['@prisma/client'];
   const hasSequelize = packageJson.dependencies?.['sequelize'];
   const hasMongoose = packageJson.dependencies?.['mongoose'];
-  
+
   let projectType: string;
   if (hasPrisma && hasMongoose) {
     projectType = 'hybrid-prisma';
@@ -60,13 +60,15 @@ export default async function generate(type: string, name: string) {
   // For hybrid projects, ask which database
   let useSQL = true;
   if (projectType.startsWith('hybrid')) {
-    const { database } = await inquirer.prompt([{
-      type: 'list',
-      name: 'database',
-      message: 'Which database for this module?',
-      choices: ['SQL', 'NoSQL'],
-      default: 'SQL'
-    }]);
+    const { database } = await inquirer.prompt([
+      {
+        type: 'list',
+        name: 'database',
+        message: 'Which database for this module?',
+        choices: ['SQL', 'NoSQL'],
+        default: 'SQL',
+      },
+    ]);
     useSQL = database === 'SQL';
   }
 
@@ -95,7 +97,7 @@ export default async function generate(type: string, name: string) {
       fs.writeFile(path.join(modulePath, `${moduleName}.service.ts`), files.service),
       fs.writeFile(path.join(modulePath, `${moduleName}.routes.ts`), files.routes),
       fs.writeFile(path.join(modulePath, `${moduleName}.dto.ts`), files.dto),
-      files.model && fs.writeFile(path.join(modulePath, `${moduleName}.model.ts`), files.model)
+      files.model && fs.writeFile(path.join(modulePath, `${moduleName}.model.ts`), files.model),
     ]);
 
     // Update routes.ts to include new module
@@ -120,7 +122,6 @@ export default async function generate(type: string, name: string) {
       console.log(chalk.white(`  4. Run: npx prisma generate && npx prisma db push`));
     }
     console.log();
-
   } catch (error) {
     spinner.fail(chalk.red('Failed to generate module'));
     console.error(chalk.red(`\nError: ${error instanceof Error ? error.message : error}`));
@@ -400,27 +401,27 @@ export type Update${ModuleName}Dto = z.infer<typeof update${ModuleName}Schema>['
 
 async function updateMainRoutes(projectRoot: string, moduleName: string) {
   const routesPath = path.join(projectRoot, 'src', 'routes.ts');
-  
-  if (!await fs.pathExists(routesPath)) {
+
+  if (!(await fs.pathExists(routesPath))) {
     return; // Skip if routes file doesn't exist
   }
 
   let content = await fs.readFile(routesPath, 'utf-8');
-  
+
   // Add import
   const importStatement = `import ${moduleName}Routes from './modules/${moduleName}/${moduleName}.routes.js';\n`;
-  
+
   // Find where to insert the import (after other imports)
   const lastImportIndex = content.lastIndexOf('import ');
   const lineEndIndex = content.indexOf('\n', lastImportIndex);
   content = content.slice(0, lineEndIndex + 1) + importStatement + content.slice(lineEndIndex + 1);
-  
+
   // Add route
   const routeStatement = `router.use('/${moduleName}s', ${moduleName}Routes);\n`;
-  
+
   // Find where to insert the route (before export)
   const exportIndex = content.indexOf('export default router');
   content = content.slice(0, exportIndex) + routeStatement + '\n' + content.slice(exportIndex);
-  
+
   await fs.writeFile(routesPath, content);
 }
